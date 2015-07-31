@@ -1,0 +1,7 @@
+config:
+  bridge:
+    name: bridge1
+    ipv4: 192.168.2.20/24
+    interfaces: 
+      - eth1
+      - eth2
