@@ -22,3 +22,9 @@ poi dare un make da dentro pcaprub_c e make install
 
 cp /var/lib/gems/2.1.0/gems/pcaprub-0.12.0/ext/pcaprub_c/pcaprub_c.so /var/lib/gems/2.1.0/gems/pcaprub-0.12.0/lib/pcaprub_c.so
 cp /var/lib/gems/2.1.0/gems/pcaprub-0.12.0/ext/pcaprub_c/pcaprub_c.so /var/lib/gems/2.1.0/extensions/x86_64-linux/2.1.0/pcaprub-0.12.0/pcaprub_c.so
+
+
+---------------
+
+note: necessario dare "ifconfig ethX up" altrimenti va in segmentation fault
+

@@ -7,23 +7,31 @@ require 'packetfu'
 
 def read_config
 	config = YAML.load_file("config.yml")
-	@bridge = config["config"]["bridge"]
+	##@bridge = config["config"]["bridge"]
+	puts "Letta configurazione: #{config}"
+	puts "Entro in config"
+	puts " - #{config['config']}"
+	cfg = config['config']
+	cfg.keys.each do |type|
+		puts "Trovata interfaccia di tipo #{type}"
+		puts "Configurazione: #{cfg[type]}"
+		thisconf = cfg[type]
+		require_relative type
+		send("start_#{type}",thisconf)
+		#require "#{type}"
+
+	end
 end
 
 read_config()
 
+
+
 puts "Trovato bridge: #{@bridge}\n"
 
 
-capture1 = PCAPRUB::Pcap.open_live('eth1', 65535, true, 0)
 capture2 = PCAPRUB::Pcap.open_live('eth2', 65535, true, 0)
 while 1==1
-	next1 = capture1.next()
-	if next1
-		#puts "Arrivato pacchetto su eth1"
-		eth_pkg = PacketFu::Packet.parse next1
-		eth_pkg.to_w("eth2")
-	end
 
 	next2 = capture2.next()
 	if next2
