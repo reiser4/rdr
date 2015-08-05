@@ -25,22 +25,3 @@ end
 
 read_config()
 
-
-
-puts "Trovato bridge: #{@bridge}\n"
-
-
-capture2 = PCAPRUB::Pcap.open_live('eth2', 65535, true, 0)
-while 1==1
-
-	next2 = capture2.next()
-	if next2
-		#puts "Arrivato pacchetto su eth2"
-		eth_pkg = PacketFu::Packet.parse next2
-		eth_pkg.to_w("eth1")
-	end
-
-	#puts(capture1.stats())
-	#puts(capture2.stats())
-end
-
