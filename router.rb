@@ -84,6 +84,20 @@ def getMyIpOnInterface(interface,config)
 	return sfullip[0]
 end
 
+def isMyIp(ip,config)
+
+	puts "Cerco se ho l'ip #{ip}"
+	config['interfaces'].keys.each do |interface|
+		fullip = config['interfaces'][interface]['ipv4']
+		sfullip = fullip.split("/")
+		if sfullip[0] == ip
+			puts "Trovato!"
+			return true
+		end
+	end
+	puts "Non trovato"
+	return false
+end
 
 def start_router(config)
 	puts "Configurazione router: #{config}"
@@ -175,25 +189,54 @@ def start_router(config)
 						dst = eth_pkg.eth_daddr 
 						puts "Pacchetto per #{dst}"
 						if dst == "00:01:02:03:04:05"
-							puts "Pacchetto per me da inoltrare!"
+							puts "Pacchetto per me da inoltrare?"
 							dst_ip = eth_pkg.ip_daddr
-							puts "Pacchetto per #{dst_ip}"
-							route = Route.getRouteFor(dst_ip,$routes)
-							print "Rotta aggiudicata: #{route} #{route.gw}"
 
-							### devo modificare il pacchetto: cambiare mac sorgente, mac destinazione, togliere 1 al ttl
+							if isMyIp(dst_ip,config)
+								puts "Pacchetto per me!"
+								puts "Tipo: #{eth_pkg.class}"
+								if eth_pkg.class == PacketFu::ICMPPacket
 
-							dst_macaddr = getMacForIp(dst_ip,config)
-							print "Mac destinazione: #{dst_macaddr}"
+									puts "Tipo: #{eth_pkg.icmp_type}"
+									if eth_pkg.icmp_type == 8
+										puts "Ping?"
 
-							if dst_macaddr != ""
-								puts "Invio! da mio mac verso #{dst_macaddr}"
-								eth_pkg.eth_daddr = dst_macaddr
-								eth_pkg.eth_saddr = "00:01:02:03:04:05"
-								eth_pkg.to_w(route.gw)
+										eth_pkg.eth_daddr = eth_pkg.eth_saddr
+										eth_pkg.eth_saddr = "00:01:02:03:04:05"
+										eth_pkg.ip_daddr = eth_pkg.ip_saddr
+										eth_pkg.ip_saddr = dst_ip
+										eth_pkg.icmp_type = 0
+										eth_pkg.icmp_calc_sum
+
+										eth_pkg.to_w(cap)
+										puts "Pong!"
+									end
+
+								end
+
+
 							else
-								puts "non invio: non ho mac destinazione..."
+								puts "Pacchetto per altro ip..."
+
+								puts "Pacchetto per #{dst_ip}"
+								route = Route.getRouteFor(dst_ip,$routes)
+								print "Rotta aggiudicata: #{route} #{route.gw}"
+
+								### devo modificare il pacchetto: cambiare mac sorgente, mac destinazione, togliere 1 al ttl
+
+								dst_macaddr = getMacForIp(dst_ip,config)
+								print "Mac destinazione: #{dst_macaddr}"
+
+								if dst_macaddr != ""
+									puts "Invio! da mio mac verso #{dst_macaddr}"
+									eth_pkg.eth_daddr = dst_macaddr
+									eth_pkg.eth_saddr = "00:01:02:03:04:05"
+									eth_pkg.to_w(route.gw)
+								else
+									puts "non invio: non ho mac destinazione..."
+								end
 							end
+
 
 						end
 					end
