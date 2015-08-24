@@ -6,9 +6,13 @@ config:
 #      - eth1
 #      - eth2
 #      - eth3
-  router:
-    interfaces:
-      eth1:
-        ipv4: 192.168.10.1/24
-      eth2:
-        ipv4: 192.168.20.1/24
+#  router:
+#    interfaces:
+#      eth1:
+#        ipv4: 192.168.10.1/24
+#      eth2:
+#        ipv4: 192.168.20.1/24
+  gre:
+    if: eth1
+    ipv4: 192.168.70.2/24
+    remote: 192.168.10.254
