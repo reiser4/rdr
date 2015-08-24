@@ -1,0 +1,29 @@
+config:
+#  switch:
+#    name: hub1
+#    ipv4: 192.168.2.20/24
+#    interfaces: 
+#      - eth1
+#      - eth2
+#      - eth3
+#  router:
+#    interfaces:
+#      eth1:
+#        ipv4: 192.168.10.1/24
+#      eth2:
+#        ipv4: 192.168.20.1/24
+  l2:
+    gre:
+      ipv4: 192.168.70.2/24
+      remote: 192.168.10.254
+    eth:
+      dev: eth1
+      ipv4: 192.168.10.1/24
+    switch:
+      name: br0
+      ipv4: 192.168.20.1/24
+      interfaces:
+        - eth2
+  ipv4:
+    gateway: 192.168.1.254
+    dns: 8.8.8.8
