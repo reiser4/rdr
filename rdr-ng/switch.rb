@@ -3,42 +3,45 @@
 class Switch
 
   def initialize(cfg)
+	@pfx = "[SWITCH] "
+	@printdebug = false
 
-    puts "Configurazione per Switch: #{cfg}"
+    cputs "#{@pfx}Configurazione per Switch: #{cfg}"
 
 	@captures = Hash.new	
 	@macs = Hash.new
 
-	puts "Avvio catture"
+	cputs "#{@pfx}Avvio catture"
 	cfg['interfaces'].each do |iface|
-		puts iface
+		cputs iface
 		@captures[iface] = PCAPRUB::Pcap.open_live(iface, 65535, true, 0)
 		@macs[iface] = Array.new
 	end
-	puts "Catture pronte: #{@captures}"
+	cputs "#{@pfx}Catture pronte: #{@captures}"
 	    
-
+	@mymac = "22:22:22:33:33:33"    
+	cputs "#{@pfx}Mio mac: #{@mymac}"
   end
   def readPacket
     
 
 		@captures.keys.each do |cap|
-			#puts cap
+			#cputs cap
 			pkg = @captures[cap].next()
 			if pkg
 				eth_pkg = PacketFu::Packet.parse pkg
-				puts "Pacchetto di classe #{eth_pkg.class}"
+				cputs "#{@pfx}Pacchetto di classe #{eth_pkg.class}"
 				pclass = eth_pkg.class
 				if pclass == PacketFu::InvalidPacket
-					puts "Pacchetto non valido!?"
+					cputs "#{@pfx}Pacchetto non valido!?"
 				else
 					src = eth_pkg.eth_saddr
 					dst = eth_pkg.eth_daddr
-					puts "Letto pacchetto ETH su interfaccia #{cap} con src #{src} e dst #{dst}"
+					cputs "#{@pfx}Letto pacchetto ETH su interfaccia #{cap} con src #{src} e dst #{dst}"
 
 					#TODO: serve una scadenza oppure uno spostamento da una porta all'altra.
 					if !@macs[cap].include? src
-						puts "Scoperto nuovo mac sull'interfaccia #{cap}"
+						cputs "#{@pfx}Scoperto nuovo mac sull'interfaccia #{cap}"
 						@macs[cap].push src
 					end
 
@@ -46,17 +49,17 @@ class Switch
 					@captures.keys.each do |scap|
 						if !founddstmac && (@macs[scap].include? dst)
 							founddstmac = true
-							puts "Mac trovato. Invio solo su interfaccia #{scap}"
-							puts "#{@macs}"
+							cputs "#{@pfx}Mac trovato. Invio solo su interfaccia #{scap}"
+							cputs "#{@pfx}#{@macs}"
 							eth_pkg.to_w(scap)
 						end
 					end
 
 					if !founddstmac
-						puts "Mac non trovato, invio a tutti..."
+						cputs "#{@pfx}Mac non trovato, invio a tutti..."
 						@captures.keys.each do |scap|
 							if scap != cap
-								puts "Invio pacchetto da #{cap} a #{scap}"
+								cputs "#{@pfx}Invio pacchetto da #{cap} a #{scap}"
 								eth_pkg.to_w(scap)
 							end
 						end
@@ -68,5 +71,7 @@ class Switch
 	nil ## todo: inviare verso il layer3 i pacchetti per me
 
   end
-
+  def cputs(text)
+    puts "#{text}" if @printdebug
+  end
 end

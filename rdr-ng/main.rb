@@ -15,19 +15,22 @@ puts "RDR NG v0.0.1"
 class Layer3
 
   def initialize(config)
-    puts "Inizializzo con configurazione: #{config}"
+    @pfx = "[MAIN] "
+    @printdebug = true
+
+    cputs "#{@pfx}Inizializzo con configurazione: #{config}"
 
     @layers2 = Array.new
 
     cfg = config['config']['l2']
     cfg.keys.each do |type|
-      puts "Avvio IF di tipo #{type}"
+      cputs "#{@pfx}Avvio IF di tipo #{type}"
 
       mytype = type.slice(0,1).capitalize + type.slice(1..-1)
 
       clazz = Object.const_get(mytype)
 
-      puts "Avvio #{clazz} con conf #{cfg[type]}"
+      cputs "#{@pfx}Avvio #{clazz} con conf #{cfg[type]}"
 
       @layers2.push(clazz.new(cfg[type]))
 
@@ -35,7 +38,7 @@ class Layer3
     
 
 
-    puts "L2: #{@layers2}"
+    cputs "#{@pfx}L2: #{@layers2}"
 
   end
 
@@ -46,16 +49,19 @@ class Layer3
       @layers2.each do |l2|
         p = l2.readPacket
         if p
-          self.processpacket(p)
+          self.processpacket(p,l2)
         end
       end
     end
   end
 
-  def processpacket(packet)
-    puts "Elaboro pacchetto #{packet}"
+  def processpacket(packet,from)
+    cputs "#{@pfx}Elaboro pacchetto ricevuto da #{from}..."
+    cputs "#{@pfx}#{packet.class}"
   end
-
+  def cputs(text)
+    puts "#{text}" if @printdebug
+  end
 end
 
 
