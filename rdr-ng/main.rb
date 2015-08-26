@@ -1,8 +1,12 @@
 
 require 'yaml'
+require 'pcaprub'
+require 'packetfu'
+
 require_relative 'gre'
 require_relative 'eth'
 require_relative 'switch'
+require_relative 'hub'
 
 puts "RDR NG v0.0.1"
 
