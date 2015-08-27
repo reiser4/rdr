@@ -1,9 +1,9 @@
 
 
-class Switch
+class Switch < L2
 
   def initialize(cfg)
-	@pfx = "[SWITCH] "
+  	super(cfg)
 	@printdebug = false
 
     cputs "#{@pfx}Configurazione per Switch: #{cfg}"
@@ -24,7 +24,6 @@ class Switch
   end
   def readPacket
     
-
 		@captures.keys.each do |cap|
 			#cputs cap
 			pkg = @captures[cap].next()
@@ -45,25 +44,8 @@ class Switch
 						@macs[cap].push src
 					end
 
-					founddstmac = false
-					@captures.keys.each do |scap|
-						if !founddstmac && (@macs[scap].include? dst)
-							founddstmac = true
-							cputs "#{@pfx}Mac trovato. Invio solo su interfaccia #{scap}"
-							cputs "#{@pfx}#{@macs}"
-							eth_pkg.to_w(scap)
-						end
-					end
-
-					if !founddstmac
-						cputs "#{@pfx}Mac non trovato, invio a tutti..."
-						@captures.keys.each do |scap|
-							if scap != cap
-								cputs "#{@pfx}Invio pacchetto da #{cap} a #{scap}"
-								eth_pkg.to_w(scap)
-							end
-						end
-					end
+					self.sendPacket(eth_pkg, cap)
+					
 				end
 			end
 		end
@@ -71,7 +53,31 @@ class Switch
 	nil ## todo: inviare verso il layer3 i pacchetti per me
 
   end
-  def cputs(text)
-    puts "#{text}" if @printdebug
+
+	def sendPacket(eth_pkg, cap = nil) #invia un pacchetto di tipo PacketFu::Packet alla porta dove ho il mac.
+
+		dst = eth_pkg.eth_daddr
+
+		founddstmac = false
+		@captures.keys.each do |scap|
+			if !founddstmac && (@macs[scap].include? dst)
+				founddstmac = true
+				cputs "#{@pfx}Mac trovato. Invio solo su interfaccia #{scap}"
+				cputs "#{@pfx}#{@macs}"
+				eth_pkg.to_w(scap)
+			end
+		end
+
+		if !founddstmac
+			cputs "#{@pfx}Mac non trovato, invio a tutti..."
+			@captures.keys.each do |scap|
+				if scap != cap
+					cputs "#{@pfx}Invio pacchetto da #{cap} a #{scap}"
+					eth_pkg.to_w(scap)
+				end
+			end
+		end
+
   end
+
 end

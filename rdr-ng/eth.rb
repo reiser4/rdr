@@ -1,39 +1,42 @@
 
 
-class Eth
+class Eth < L2
 
   def initialize(cfg)
-  	@pfx = "[ETH] "
-  	@printdebug = false
+  	super(cfg)
+  	@printdebug = true
+    cputs "Configurazione per ETH: #{cfg}"
+	cputs "Avvio cattura"
+	@iface = cfg['dev']
+	@capture = PCAPRUB::Pcap.open_live(@iface, 65535, true, 0)
+	cputs "Cattura pronta: #{@captures}"
 
-    cputs "#{@pfx}Configurazione per ETH: #{cfg}"
-	cputs "#{@pfx}Avvio cattura"
-	iface = cfg['dev']
-	@capture = PCAPRUB::Pcap.open_live(iface, 65535, true, 0)
-	cputs "#{@pfx}Cattura pronta: #{@captures}"
-
-	@mymac = "00:01:02:02:02:02"
-	cputs "#{@pfx}Mio mac: #{@mymac}"
+	@mac = "00:01:02:02:02:02"
+	cputs "Mio mac: #{@mac}"
 
   end
   def readPacket
     pkg = @capture.next()
 	if pkg
-		cputs "#{@pfx}Ricevuto pacchetto su ETH!"
+		cputs "Ricevuto pacchetto su ETH!"
 		eth_pkg = PacketFu::Packet.parse pkg
 		if eth_pkg.class == PacketFu::InvalidPacket
-			cputs "#{@pfx}Pacchetto non valido, non lo passo al layer 3"
+			cputs "Pacchetto non valido, non lo passo al layer 3"
 			return nil
 		end
 		dst = eth_pkg.eth_daddr
-		cputs "#{@pfx}Pacchetto per #{dst}"
-		return eth_pkg if dst == @mymac
+		cputs "Pacchetto per #{dst}"
+		return eth_pkg if dst == @mac
 		return eth_pkg if dst == "ff:ff:ff:ff:ff:ff"
-		cputs "#{@pfx}Pacchetto non per me: non passo al layer 3"
+		cputs "Pacchetto non per me: non passo al layer 3"
 		return nil
 	end
   end
-  def cputs(text)
-    puts "#{text}" if @printdebug
+
+  def sendPacket(packet)
+  	cputs "Pacchetto: #{packet.arp_dst_ip_readable} #{packet.arp_src_ip_readable}"
+  	#File.write('/var/www/html/pkt6', packet)
+  	packet.to_w(@iface)
   end
+
 end
