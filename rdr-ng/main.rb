@@ -9,6 +9,7 @@ require_relative 'eth'
 require_relative 'switch'
 require_relative 'hub'
 require_relative 'arp'
+require_relative 'icmp'
 
 puts "RDR NG v0.0.1"
 
@@ -21,6 +22,7 @@ class Layer3
     @printdebug = true
     cputs "#{@pfx}Inizializzo con configurazione: #{config}"
     @arp = Arp.new
+    @icmp = Icmp.new
     @layers2 = Array.new
     cfg = config['config']['l2']
     cfg.keys.each do |type|
@@ -51,6 +53,10 @@ class Layer3
     if packet.class == PacketFu::ARPPacket
       #pacchetto di tipo ARP per me?
       @arp.parsepacket(packet,@layers2)      
+    end
+    if packet.class == PacketFu::ICMPPacket
+      #icmp per me?
+      @icmp.parsepacket(packet,@layers2)
     end
   end
   def cputs(text)

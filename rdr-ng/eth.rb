@@ -34,7 +34,7 @@ class Eth < L2
   end
 
   def sendPacket(packet)
-  	cputs "Pacchetto: #{packet.arp_dst_ip_readable} #{packet.arp_src_ip_readable}"
+  	cputs "Pacchetto..."
   	#File.write('/var/www/html/pkt6', packet)
   	packet.to_w(@iface)
   end
