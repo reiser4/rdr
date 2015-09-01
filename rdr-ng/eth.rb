@@ -25,7 +25,7 @@ class Eth < L2
 			return nil
 		end
 		dst = eth_pkg.eth_daddr
-		cputs "Pacchetto per #{dst}"
+		cputs "Pacchetto per #{dst}, miomac: #{@mac}"
 		return eth_pkg if dst == @mac
 		return eth_pkg if dst == "ff:ff:ff:ff:ff:ff"
 		cputs "Pacchetto non per me: non passo al layer 3"

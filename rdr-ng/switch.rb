@@ -46,11 +46,18 @@ class Switch < L2
 
 					self.sendPacket(eth_pkg, cap)
 					
+					dst = eth_pkg.eth_daddr
+					cputs "Pacchetto per #{dst}, miomac: #{@mac}"
+					return eth_pkg if dst == @mac
+					return eth_pkg if dst == "ff:ff:ff:ff:ff:ff"
+					cputs "Pacchetto non per me: non passo al layer 3"
 				end
 			end
 		end
 
-	nil ## todo: inviare verso il layer3 i pacchetti per me
+		
+
+	return nil ## todo: inviare verso il layer3 i pacchetti per me
 
   end
 

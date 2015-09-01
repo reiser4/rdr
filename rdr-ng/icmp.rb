@@ -15,7 +15,7 @@ class Icmp
 	end
 
 	def parsepacket(packet,layers2)
-		cputs "Elaboro pacchetto #{packet} "
+		#cputs "Elaboro pacchetto #{packet} "
 		dst_ip = packet.ip_daddr
 		cputs "IP dst: #{dst_ip}"
 		layers2.each do |l2|
