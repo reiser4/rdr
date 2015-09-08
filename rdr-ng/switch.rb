@@ -1,21 +1,33 @@
 
 
+
+
+require 'mysql'
+
+
+
 class Switch < L2
 
   def initialize(cfg)
   	super(cfg)
-	@printdebug = false
+	@printdebug = true
 
+	#todo: spostare in file apposito
+	@con = Mysql.new 'localhost', 'root', 'enrico', 'rdr'
+
+	cputs "Mysql avviato: #{@con}"
     cputs "#{@pfx}Configurazione per Switch: #{cfg}"
 
 	@captures = Hash.new	
-	@macs = Hash.new
+	# rimpiazzato da mysql
+	#@macs = Hash.new
 
 	cputs "#{@pfx}Avvio catture"
 	cfg['interfaces'].each do |iface|
 		cputs iface
 		@captures[iface] = PCAPRUB::Pcap.open_live(iface, 65535, true, 0)
-		@macs[iface] = Array.new
+		#rimpiazzato da mysql
+		#@macs[iface] = Array.new
 	end
 	cputs "#{@pfx}Catture pronte: #{@captures}"
 	    
@@ -39,9 +51,10 @@ class Switch < L2
 					cputs "#{@pfx}Letto pacchetto ETH su interfaccia #{cap} con src #{src} e dst #{dst}"
 
 					#TODO: serve una scadenza oppure uno spostamento da una porta all'altra.
-					if !@macs[cap].include? src
+					if !mysqlFindMac(src)
 						cputs "#{@pfx}Scoperto nuovo mac sull'interfaccia #{cap}"
-						@macs[cap].push src
+						mysqlAddMac(src, cap)
+						#@macs[cap].push src
 					end
 
 					self.sendPacket(eth_pkg, cap)
@@ -55,9 +68,7 @@ class Switch < L2
 			end
 		end
 
-		
-
-	return nil ## todo: inviare verso il layer3 i pacchetti per me
+	return nil 
 
   end
 
@@ -65,17 +76,19 @@ class Switch < L2
 
 		dst = eth_pkg.eth_daddr
 
-		founddstmac = false
-		@captures.keys.each do |scap|
-			if !founddstmac && (@macs[scap].include? dst)
-				founddstmac = true
-				cputs "#{@pfx}Mac trovato. Invio solo su interfaccia #{scap}"
-				cputs "#{@pfx}#{@macs}"
-				eth_pkg.to_w(scap)
-			end
-		end
+		#founddstmac = false
+		#@captures.keys.each do |scap|
+		#	if !founddstmac && (@macs[scap].include? dst)
+		#		founddstmac = true
+		#		cputs "#{@pfx}Mac trovato. Invio solo su interfaccia #{scap}"
+		#		cputs "#{@pfx}#{@macs}"
+		#		eth_pkg.to_w(scap)
+		#	end
+		#end
 
-		if !founddstmac
+		dstmacif = mysqlFindMac(dst)
+
+		if !dstmacif
 			cputs "#{@pfx}Mac non trovato, invio a tutti..."
 			@captures.keys.each do |scap|
 				if scap != cap
@@ -83,8 +96,40 @@ class Switch < L2
 					eth_pkg.to_w(scap)
 				end
 			end
+		else
+			cputs "Mac trovato!! #{dstmacif}"
+			scap = dstmacif[3]
+			eth_pkg.to_w(scap)
 		end
 
   end
+
+
+  def mysqlFindMac(mac)
+  	#todo: implementare rimozione voci vecchie
+
+  	rs = @con.query("SELECT * FROM `switchosts` WHERE `mac` = '#{mac}';")
+  	n_rows = rs.num_rows
+  	if n_rows == 0
+  		return false
+  	end
+
+  	res = rs.fetch_row
+  	puts "#{res}"
+  	return res
+  	#todo: se trovato: rinfresco
+
+
+
+  	#@con.query
+
+  end
+
+  def mysqlAddMac(mac, port)
+  	bridge = @name
+  	now = Time.now.to_i
+  	@con.query("INSERT INTO `switchosts` (`switch`, `mac`, `port`, `timeout`) VALUES ('#{bridge}', '#{mac}', '#{port}', '#{now}');")
+  end
+
 
 end
