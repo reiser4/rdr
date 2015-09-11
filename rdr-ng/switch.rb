@@ -115,7 +115,21 @@ class Switch < L2
   	end
 
   	res = rs.fetch_row
+
+  	now = Time.now.to_i
+  	age = res[4].to_i
+  	id = res[0]
+
+  	if (now-age) > 30
+  		#troppo vecchio: elimino
+  		dq = @con.query("DELETE FROM `switchosts` WHERE `id`='#{id}';")
+  		return false
+  	end
+
   	puts "#{res}"
+
+  	uq = @con.query("UPDATE `switchosts` SET `timeout`='#{now}' WHERE `id`='#{id}';")
+
   	return res
   	#todo: se trovato: rinfresco
 

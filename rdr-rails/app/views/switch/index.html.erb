@@ -1,5 +1,4 @@
-<h1>Switch#index</h1>
-<p>Find me in app/views/switch/index.html.erb</p>
+<h1>Switch L2</h1>
 
 
 <style>
@@ -36,34 +35,7 @@
 
 
 <div id="bridgedata">
-
- <div class="bridge">
-  <div class="bridgename">br0</div>
-  <div class="port">
-    <div class="portname">eth0</div>
-    <div class="host">foo:bar</div>
-    <div class="host">test:2</div>
-  </div>  
-  <div class="port">
-    <div class="portname">eth1</div>
-    <div class="host">test:eth1</div>
-  </div>
- </div>
-
- <div class="bridge">
-  <div class="bridgename">br1</div>
-  <div class="port">
-    <div class="portname">eth0</div>
-    <div class="host">foo:bar</div>
-    <div class="host">test:2</div>
-  </div>  
-  <div class="port">
-    <div class="portname">eth1</div>
-    <div class="host">test:eth1</div>
-  </div>
- </div>
-
-
+caricamento...
 </div>
 
 
@@ -75,29 +47,42 @@ setInterval(function(){
     out = JSON.parse(data.responseText);
 
     outhtml = "";
-
     bridges = {};
 
+    // porto il json in un hash innestato
     for (i = 0; i < out.length; i++) {
 
       bridge = out[i].switch;
       port = out[i].port;
       mac = out[i].mac;
       timeout = out[i].timeout;
-
       if (bridges[bridge] === undefined) {
         bridges[bridge] = {};
       }
-
       if (bridges[bridge][port] === undefined) {
         bridges[bridge][port] = [];
       }
-
       bridges[bridge][port].push({mac: mac, timeout: timeout});
-
     }
 
-    console.log(bridges);
+    now = new Date().getTime() / 1000;
+
+    // creo l'html
+    for (var br in bridges) {
+      outhtml += "<div class='bridge'><div class='bridgename'>"+br+"</div>";
+      for (var iface in bridges[br]) {
+        outhtml += "<div class='port'><div class='portname'>"+iface+"</div>";
+        for (var idx in bridges[br][iface]) {
+          to = bridges[br][iface][idx].timeout;
+          diff = parseInt(now-to);
+          outhtml += "<div class='host'>"+bridges[br][iface][idx].mac+" (eta`: "+diff+"s)</div>";
+        }
+        outhtml += "</div>";
+      }
+      outhtml += "</div>";
+    }
+
+    jQuery("#bridgedata").html(outhtml);
 
   }})
 
