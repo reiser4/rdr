@@ -67,11 +67,16 @@ class Layer3
       forme = false
       dst_ip = packet.ip_daddr
       cputs "IP dst: #{dst_ip}"
-      @layers2.each do |l2|
-        cputs "#{l2}"
-        if l2.has_ip? dst_ip
-          cputs "Ho io questo ip, devo rispondere"
-          forme = true
+
+      if dst_ip == "255.255.255.255"
+        forme = true
+      else
+        @layers2.each do |l2|
+          cputs "#{l2}"
+          if l2.has_ip? dst_ip
+            cputs "Ho io questo ip, devo rispondere"
+            forme = true
+          end
         end
       end
 
@@ -105,6 +110,7 @@ class Layer3
           puts "Non ho trovato rotta verso #{dst_ip}"
         else
 
+          #todo: funziona solo con rotte connesse...
           cputs "Interfaccia dst: #{router}"
 
           cputs "Cerco mac DST"
