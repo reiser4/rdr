@@ -34,7 +34,7 @@ class Switch < L2
 	@mymac = "22:22:22:33:33:33"    
 	cputs "#{@pfx}Mio mac: #{@mymac}"
   end
-  def readPacket
+  def readPacket(layers2)
     
 		@captures.keys.each do |cap|
 			#cputs cap
@@ -57,7 +57,7 @@ class Switch < L2
 						#@macs[cap].push src
 					end
 
-					self.sendPacket(eth_pkg, cap)
+					self.sendPacket(eth_pkg, layers2, cap)
 					
 					dst = eth_pkg.eth_daddr
 					cputs "Pacchetto per #{dst}, miomac: #{@mac}"
@@ -72,7 +72,7 @@ class Switch < L2
 
   end
 
-	def sendPacket(eth_pkg, cap = nil) #invia un pacchetto di tipo PacketFu::Packet alla porta dove ho il mac.
+	def sendPacket(eth_pkg, layers2, cap = nil) #invia un pacchetto di tipo PacketFu::Packet alla porta dove ho il mac.
 
 		dst = eth_pkg.eth_daddr
 

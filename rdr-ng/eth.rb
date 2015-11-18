@@ -15,7 +15,7 @@ class Eth < L2
 	cputs "Mio mac: #{@mac}"
 
   end
-  def readPacket
+  def readPacket(l2)
     pkg = @capture.next()
 	if pkg
 		cputs "Ricevuto pacchetto su ETH!"
@@ -33,7 +33,7 @@ class Eth < L2
 	end
   end
 
-  def sendPacket(packet)
+  def sendPacket(packet,layers2)
   	cputs "Pacchetto..."
   	#File.write('/var/www/html/pkt6', packet)
   	packet.to_w(@iface)

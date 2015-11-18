@@ -18,7 +18,7 @@ class Hub
 
 
   end
-  def readPacket
+  def readPacket(l2)
     #puts "Leggo pacchetti dall'hub"
     @captures.keys.each do |cap|
 		#puts cap

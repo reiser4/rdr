@@ -31,7 +31,7 @@ class Arp
 					dst_ip  = packet.arp_src_ip
 
 					reply = self.arpreplypacket(src_mac, dst_mac, src_ip, dst_ip)
-					l2.sendPacket(reply)
+					l2.sendPacket(reply,layers2)
 				else
 					if packet.arp_opcode == 2
 						cputs "Ricevuto ARP Reply!"
@@ -83,7 +83,7 @@ class Arp
 		arprequest.arp_daddr_mac = "ff:ff:ff:ff:ff:ff"
 		arprequest.arp_saddr_mac = l2.mac()
 
-		l2.sendPacket(arprequest)
+		l2.sendPacket(arprequest,l2)
 		puts "Richiesta inviata..."
 
 	end

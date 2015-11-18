@@ -29,7 +29,7 @@ class Icmp
 				dst_ip  = packet.ip_saddr
 
 				reply = self.icmpreplypacket(packet, src_mac, dst_mac, src_ip, dst_ip)
-				l2.sendPacket(reply)
+				l2.sendPacket(reply,layers2)
 			end
 		end
 	end

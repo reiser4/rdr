@@ -13,10 +13,10 @@ config:
 #      eth2:
 #        ipv4: 192.168.20.1/24
   l2:
-    gre:
-      name: gre0
-      ipv4: 192.168.70.2/24
-      remote: 192.168.10.254
+#    gre:
+#      name: gre0
+#      ipv4: 192.168.30.1/24
+#      remote: 192.168.20.2
     eth:
       name: eth3
       dev: eth3

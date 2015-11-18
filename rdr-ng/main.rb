@@ -11,6 +11,7 @@ require_relative 'hub'
 require_relative 'arp'
 require_relative 'icmp'
 require_relative 'routingtable'
+require_relative 'firewall'
 
 puts "RDR NG v0.0.1"
 
@@ -22,6 +23,7 @@ class Layer3
     @pfx = "[MAIN] "
     @printdebug = true
     cputs "#{@pfx}Inizializzo con configurazione: #{config}"
+    @firewall = Firewall.new
     @arp = Arp.new
     @icmp = Icmp.new
     @layers2 = Array.new
@@ -43,7 +45,7 @@ class Layer3
   def start
     while 1==1 do
       @layers2.each do |l2|
-        p = l2.readPacket
+        p = l2.readPacket(@layers2)
         if p
           self.processpacket(p,l2)
         end
@@ -104,58 +106,67 @@ class Layer3
       else
         cputs "Pacchetto non per me, devo forwardare!!!"
 
-        router = @routingtable.getRouteFor(dst_ip)
+        chain = "forward"
 
-        if !router
-          puts "Non ho trovato rotta verso #{dst_ip}"
-        else
+        if @firewall.canAccept(packet, chain)
 
-          #todo: funziona solo con rotte connesse...
-          cputs "Interfaccia dst: #{router}"
+          router = @routingtable.getRouteFor(dst_ip)
 
-          cputs "Cerco mac DST"
-
-          macdst = false
-          gotif = false
-          srcmac = false
-          iface = false
-          @layers2.each do |l2|
-            if l2.name() == router
-              puts "Assegno srcmac"
-              srcmac = l2.mac()
-              puts "Srcmac: #{srcmac}"
-              macdst = @arp.getMac(dst_ip,l2)
-              gotif = true
-              iface = l2
-              puts "Nome matchato #{l2}"
-            else 
-              puts "Nome non matchato: #{l2} #{l2.name()}"
-            end
-          end
-
-          if !gotif
-            puts "Nessun layer2 chiamato #{router} ?!?!?"
-          end
-          if !macdst
-            puts "Non ho trovato il mac a cui inoltrare la richiesta..."
+          if !router
+            puts "Non ho trovato rotta verso #{dst_ip}"
           else
-            if gotif
-              puts "Srcmac: #{srcmac}"
-              packet.eth_saddr = srcmac
-              packet.eth_daddr = macdst
-              puts "Invio a #{router}"
-              iface.sendPacket(packet)
-            else
-              puts "Ho mac ma non ho interfaccia..."
+
+            #todo: funziona solo con rotte connesse...
+            cputs "Interfaccia dst: #{router}"
+
+            cputs "Cerco mac DST"
+
+            macdst = false
+            gotif = false
+            srcmac = false
+            iface = false
+            @layers2.each do |l2|
+              if l2.name() == router
+                puts "Assegno srcmac"
+                srcmac = l2.mac()
+                puts "Srcmac: #{srcmac}"
+                macdst = @arp.getMac(dst_ip,l2)
+                gotif = true
+                iface = l2
+                puts "Nome matchato #{l2}"
+              else 
+                puts "Nome non matchato: #{l2} #{l2.name()}"
+              end
             end
-          end
+
+            if !gotif
+              puts "Nessun layer2 chiamato #{router} ?!?!?"
+            end
+            if !macdst
+              puts "Non ho trovato il mac a cui inoltrare la richiesta..."
+            else
+              if gotif
+                puts "Srcmac: #{srcmac}"
+                packet.eth_saddr = srcmac
+                packet.eth_daddr = macdst
+                puts "Invio a #{router}"
+                iface.sendPacket(packet,@layers2)
+              else
+                puts "Ho mac ma non ho interfaccia..."
+              end
+            end
 
 
           # riscrivo mac
 
           # tolgo TTL
 
+          end
+        else
+          puts "Pacchetto droppato da regola del firewall"
         end
+
+
       end
     end
 

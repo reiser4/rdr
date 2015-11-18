@@ -42,7 +42,7 @@ class L2
  		return @mac
  	end
 
- 	def sendPacket(packet)
+ 	def sendPacket(packet,layers2)
  		cputs "sendPacket non implementato!!"
  	end
 end
