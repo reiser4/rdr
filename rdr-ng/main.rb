@@ -106,10 +106,10 @@ class Layer3
       else
         cputs "Pacchetto non per me, devo forwardare!!!"
 
-        chain = "forward"
+        if @firewall.canAccept(packet, "forward")
 
-        if @firewall.canAccept(packet, chain)
-
+          packet = @firewall.nat(packet, "dstnat")
+          dst_ip = packet.ip_daddr
           router = @routingtable.getRouteFor(dst_ip)
 
           if !router

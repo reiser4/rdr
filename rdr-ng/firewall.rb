@@ -57,5 +57,32 @@ class Firewall
 
 	end
 
+	def nat(packet, chain)
+		src = packet.ip_saddr
+		dst = packet.ip_daddr
+		cputs "Natto pacchetto: da #{src} a #{dst} su chain #{chain}"
+
+		rs = @con.query("SELECT * FROM `firewallnat` WHERE `chain` = '#{chain}' ORDER BY `id` ASC;")
+
+		while row = rs.fetch_row do
+			cputs "Regola incontrata: #{row}"
+			if ipMatch(row[2], src)
+				cputs "Sorgente corrisponde #{row[2]} #{src}"
+				if ipMatch(row[3], dst)
+					cputs "Destinazione corrisponde #{row[3]} #{dst}"
+					if row[4] == "dst-nat"
+						cputs "Riscrivo destinazione con dstnat #{dst} -> #{row[5]}"
+						packet.ip_daddr = row[5]
+						packet.ip_recalc
+					end
+				end
+			end
+   		end
+  		cputs "Fine manipolazioni NAT"
+
+
+		return packet
+
+	end
 
 end
