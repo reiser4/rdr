@@ -1,0 +1,37 @@
+
+<center><h1>Firewall filters</h1></center>
+<br/><br/>
+<table class="table table-striped" style="width: 80%; margin: 10px auto;">
+
+	<thead>
+	<tr>
+		<th>ID</th>
+		<th>Chain</th>
+		<th>Source</th>
+		<th>Destination</th>
+		<th>Action</th>
+	</tr>
+	</thead>
+	<tbody>
+	<% @firewallfilters.each do |ff| %>
+		<tr>
+			<td><%= ff.id %></td>
+			<td><%= ff.chain %></td>
+			<td><%= ff.src %></td>
+			<td><%= ff.dst %></td>
+			<td><% 
+
+			if ff.action == "accept"
+				concat image_tag("Action-ok-icon.png", size: "20x20")
+			end
+			if ff.action == "drop"
+				concat image_tag("Action-cancel-icon.png", size: "20x20")
+			end
+			
+
+				%> <%= ff.action %></td>
+		</tr>
+
+	<% end %>
+	</tbody>
+</table>

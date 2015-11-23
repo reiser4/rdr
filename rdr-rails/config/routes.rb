@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   get 'traffic/index'
 
+  get 'traffic', to: 'traffic#index'
+  get 'firewallfilter', to: 'firewallfilter#index'
+  get 'firewallnat', to: 'firewallnat#index'
+  get 'trace', to: 'trace#index'
+
+  get 'firewallfilter/index'
+
+  get 'switch', to: 'switch#index'
   get 'switch/index'
   get 'switch/getdata'
 
@@ -10,7 +18,7 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  root 'switch#index'
+  root 'index#index'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
