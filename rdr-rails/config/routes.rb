@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'traffic/index'
+
   get 'switch/index'
   get 'switch/getdata'
 

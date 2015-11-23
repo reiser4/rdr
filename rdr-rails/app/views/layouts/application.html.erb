@@ -13,10 +13,25 @@
   	font-size: 12pt;
 
   }
+
+  #menu {
+	text-align: center;
+	padding: 20px;
+	background: #aaa;
+	border-bottom: 1px solid #333;
+  }
+
   </style>
 
 </head>
 <body>
+
+<div id="menu">
+<a class="btn btn-lg btn-primary" href="/traffic">Traffico</a>
+<a class="btn btn-lg btn-primary" href="/switch">Switch</a>
+<a class="btn btn-lg btn-primary" href="/firewall">Firewall</a>
+<a class="btn btn-lg btn-primary" href="/nat">Nat</a>
+</div>
 
 <%= yield %>
 
