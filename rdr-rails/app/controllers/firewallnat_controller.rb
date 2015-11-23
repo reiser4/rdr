@@ -1,5 +1,6 @@
 class FirewallnatController < ApplicationController
   def index
+  	@firewallnat = Firewallnat.all
   end
 
   def getdata
