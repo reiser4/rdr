@@ -1,0 +1,2 @@
+module SwitchHelper
+end

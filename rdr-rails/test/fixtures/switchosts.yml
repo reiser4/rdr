@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  switch: MyString
+  mac: MyString
+  port: MyString
+  timeout: 
+
+two:
+  switch: MyString
+  mac: MyString
+  port: MyString
+  timeout: 
