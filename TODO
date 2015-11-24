@@ -11,10 +11,4 @@ tabella del traffico
 leggere traffico e fare output json
 richieste ajax che leggono traffico e aggiungono righe ai grafici
 
-codice per filtro a layer 3
-NAT layer 3
-
-visualizzazione regole filtri
-visualizzazione host interessati al nat
-visualizzazione host routing layer 3
 

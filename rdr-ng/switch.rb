@@ -22,15 +22,19 @@ class Switch < L2
 	# rimpiazzato da mysql
 	#@macs = Hash.new
 
+	@stats = Hash.new
+
 	cputs "#{@pfx}Avvio catture"
 	cfg['interfaces'].each do |iface|
-		cputs iface
+		#cputs iface
 		@captures[iface] = PCAPRUB::Pcap.open_live(iface, 65535, true, 0)
+		createRRD(iface)
+		@stats[iface] = {"tx" => 0, "rx" => 0}
 		#rimpiazzato da mysql
 		#@macs[iface] = Array.new
 	end
 	cputs "#{@pfx}Catture pronte: #{@captures}"
-	    
+
 	@mymac = "22:22:22:33:33:33"    
 	cputs "#{@pfx}Mio mac: #{@mymac}"
   end
@@ -40,6 +44,8 @@ class Switch < L2
 			#cputs cap
 			pkg = @captures[cap].next()
 			if pkg
+				@stats[cap]["rx"] += pkg.size
+				saveRRD()
 				eth_pkg = PacketFu::Packet.parse pkg
 				cputs "#{@pfx}Pacchetto di classe #{eth_pkg.class}"
 				pclass = eth_pkg.class
@@ -94,12 +100,16 @@ class Switch < L2
 				if scap != cap
 					cputs "#{@pfx}Invio pacchetto da #{cap} a #{scap}"
 					eth_pkg.to_w(scap)
+					@stats[scap]["tx"] += eth_pkg.size
+					saveRRD()
 				end
 			end
 		else
 			cputs "Mac trovato!! #{dstmacif}"
 			scap = dstmacif[3]
 			eth_pkg.to_w(scap)
+			@stats[scap]["tx"] += eth_pkg.size
+			saveRRD()
 		end
 
   end

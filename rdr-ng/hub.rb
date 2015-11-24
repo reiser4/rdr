@@ -10,8 +10,9 @@ class Hub
 	
 	puts "Avvio catture"
 	cfg['interfaces'].each do |iface|
-		puts iface
+		cputs iface
 		@captures[iface] = PCAPRUB::Pcap.open_live(iface, 65535, true, 0)
+		createRRD(iface)
 	end
 	puts "Catture pronte: #{@captures}"
 

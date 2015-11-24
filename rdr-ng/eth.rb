@@ -11,6 +11,8 @@ class Eth < L2
 	@capture = PCAPRUB::Pcap.open_live(@iface, 65535, true, 0)
 	cputs "Cattura pronta: #{@captures}"
 
+	createRRD(@iface)
+
 	@mac = "00:01:02:02:02:02"
 	cputs "Mio mac: #{@mac}"
 

@@ -94,7 +94,7 @@ class Layer3
           proto = packet.ip_proto
           cputs "Pacchetto IP di tipo #{proto}"
           if proto == 47
-            cputs "Passo al l2 GRE"
+            cputs "Passo al l2 GRE, se esiste..."
             @layers2.each do |l2|
               if l2.class == Gre
                 cputs "Mando a #{l2}"
