@@ -12,7 +12,8 @@ class Eth < L2
 	cputs "Cattura pronta: #{@captures}"
 
 	createRRD(@iface)
-
+	@stats = Hash.new
+	@stats[@iface] = {"tx" => 0, "rx" => 0}
 	@mac = "00:01:02:02:02:02"
 	cputs "Mio mac: #{@mac}"
 
@@ -20,6 +21,8 @@ class Eth < L2
   def readPacket(l2)
     pkg = @capture.next()
 	if pkg
+		@stats[@iface]["rx"] += pkg.size
+		saveRRD()
 		cputs "Ricevuto pacchetto su ETH!"
 		eth_pkg = PacketFu::Packet.parse pkg
 		if eth_pkg.class == PacketFu::InvalidPacket
@@ -38,6 +41,8 @@ class Eth < L2
   def sendPacket(packet,layers2)
   	cputs "Pacchetto..."
   	#File.write('/var/www/html/pkt6', packet)
+  	@stats[@iface]["tx"] += packet.size
+  	saveRRD()
   	packet.to_w(@iface)
   end
 

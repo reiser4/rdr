@@ -14,37 +14,29 @@ class L2
 	end
 
 	def createRRD(iface)
-
 		if File.exist?("../rdr-rails/rrd/" + iface + ".rrd")
 			cputs "Database RRD trovato: " + iface
 		else
 			cputs "Creo database RRD per "+iface
-			cmd = "cd ../rdr-rails/rrd && rrdtool create "+iface+".rrd --start 1448381001 DS:tx:COUNTER:600:U:U DS:rx:COUNTER:600:U:U RRA:AVERAGE:0.5:1:10"
+			cmd = "cd ../rdr-rails/rrd && rrdtool create "+iface+".rrd -s 60 DS:tx:COUNTER:300:0:U DS:rx:COUNTER:300:0:U RRA:AVERAGE:0.5:1:250"
 			cputs cmd
 			system(cmd)
 		end
-
 	end
 
 
 	def saveRRD()
-
-		#cputs "Verifico se devo salvare i dati RRD -----------------------------------"
-		if (Time.now.to_i - @rrdtime) > 5 * 60
+		if (Time.now.to_i - @rrdtime) > 1 * 60
 			@rrdtime = Time.now.to_i
 			cputs "Salvo dati RRD..."
-
 			@stats.keys.each do |iface|
-				cputs iface
-				cputs @stats[iface]["tx"]
-				cputs @stats[iface]["rx"]
-				cmd = "cd ../rdr-rails/rrd && rrdtool update " + iface + ".rrd N:"+@stats[iface]["tx"].to_s+":"+@stats[iface]["rx"].to_s
+				cmd = "cd ../rdr-rails/rrd && rrdtool update " + iface + ".rrd N:"+
+					((@stats[iface]["tx"] * 8).to_s) +":"+
+					((@stats[iface]["rx"] * 8).to_s)
 				cputs cmd
-				system(cmd)
+				cputs system(cmd)
 			end
-			#cputs "Rx e Tx: " + @stats[iface]
 		end
-
 	end
 
 

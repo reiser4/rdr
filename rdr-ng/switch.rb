@@ -10,7 +10,7 @@ class Switch < L2
 
   def initialize(cfg)
   	super(cfg)
-	@printdebug = true
+	@printdebug = false
 
 	#todo: spostare in file apposito
 	@con = Mysql.new 'localhost', 'root', 'enrico', 'rdr'
@@ -136,7 +136,7 @@ class Switch < L2
   		return false
   	end
 
-  	puts "#{res}"
+  	cputs "#{res}"
 
   	uq = @con.query("UPDATE `switchosts` SET `timeout`='#{now}' WHERE `id`='#{id}';")
 
