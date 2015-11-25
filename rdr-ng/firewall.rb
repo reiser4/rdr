@@ -1,4 +1,7 @@
 
+require 'elasticsearch'
+
+
 class Firewall
 
 
@@ -8,7 +11,8 @@ class Firewall
 		@con = Mysql.new 'localhost', 'root', 'enrico', 'rdr'
 		cputs "Mysql avviato: #{@con}"
 		cputs "Avviato Firewall"
-		
+		@client = Elasticsearch::Client.new log: true
+
 
 	end
 
@@ -41,13 +45,26 @@ class Firewall
 				cputs "Sorgente corrisponde #{row[2]} #{src}"
 				if ipMatch(row[3], dst)
 					cputs "Destinazione corrisponde #{row[3]} #{dst}"
-					if row[4] == "drop"
+					action = row[4]
+					if action == "drop"
 						cputs "Droppo"
 						return false
 					end
-					if row[4] == "accept"
+					if action == "accept"
 						cputs "Accetto"
 						return true
+					end
+					if action == "elasticsearch"
+						cputs "Loggo su elasticsearch"
+						@client.index(
+							index: 'rdr', 
+							type: 'rdr-packet', 
+							body: { 
+								src: src, 
+								dst: dst, 
+								rule: row[0], 
+								chain: chain,  }, 
+							refresh: true)
 					end
 				end
 			end

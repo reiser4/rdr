@@ -27,6 +27,11 @@
 			if ff.action == "drop"
 				concat image_tag("Action-cancel-icon.png", size: "20x20")
 			end
+			if ff.action == "elasticsearch"
+				concat image_tag("elastic.png", size: "20x20")
+			end
+
+			
 			
 
 				%> <%= ff.action %></td>
